@@ -24,6 +24,22 @@ case class Datastore(
     underlying.commit(request).getMutationResults(0).getKey()
   }
 
+  def update(entity: Entity) = {
+    val request = CommitRequest.newBuilder()
+      .addMutations(Mutation.newBuilder().setUpdate(entity))
+      .setMode(CommitRequest.Mode.NON_TRANSACTIONAL)
+      .build()
+    underlying.commit(request).getMutationResults(0).getKey()
+  }
+
+  def put(entity: Entity) = {
+    val request = CommitRequest.newBuilder()
+      .addMutations(Mutation.newBuilder().setUpsert(entity))
+      .setMode(CommitRequest.Mode.NON_TRANSACTIONAL)
+      .build()
+    underlying.commit(request).getMutationResults(0).getKey()
+  }
+
   def delete(key: Key) = {
     val request = CommitRequest.newBuilder()
       .addMutations(Mutation.newBuilder().setDelete(key))
@@ -33,7 +49,7 @@ case class Datastore(
   }
 
   def delete(kind: String, name: String) = {
-    val key = DatastoreHelper.makeKey("Zombie", "heroine")
+    val key = DatastoreHelper.makeKey(kind, name)
     val request = CommitRequest.newBuilder()
       .addMutations(Mutation.newBuilder().setDelete(key))
       .setMode(CommitRequest.Mode.NON_TRANSACTIONAL)
